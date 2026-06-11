@@ -9,3 +9,5 @@
   newsletteru), tisková verze `/tisk`.
 - Vytvořeny Ecomail seznamy: 5 (polední), 6 (víkendové), 7 (novinky).
 - Repo `stipekp/zastavka-web`, napojeno na Netlify (auto-deploy z `main`).
+- Netlify sajta `zastavka-web` vytvořena přes CLI (MCP konektor má mrtvý
+  token), env proměnné nastaveny — chybí jen `ECOMAIL_API_KEY`.

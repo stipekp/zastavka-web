@@ -8,9 +8,15 @@
 
 ## Netlify
 
-- Site: *(doplněno při vytvoření — viz CHANGELOG)*
+- Site: **zastavka-web** · https://zastavka-web.netlify.app
+  - site id `8bb88db6-8103-4ee6-bcc1-9abd3fb8a008`, tým `stipek-p`
+  - admin: https://app.netlify.com/projects/zastavka-web
+- Napojeno na GitHub (installation_id 139345471), branch `main`, auto-deploy
 - Build: `npm run build` → `dist/`, funkce `netlify/functions/`
 - Blobs store: `zastavka` (vzniká automaticky prvním zápisem)
+- **Netlify MCP konektor vrací 401 (expirovaný token)** — používej lokální
+  `netlify` CLI, je přihlášené jako stipek.p@gmail.com a funguje.
+  V účtu je i starší sajta `zastavka-restaurace` (jiné repo) — nesahat.
 
 ### Env proměnné (Site settings → Environment variables)
 
