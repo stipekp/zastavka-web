@@ -14,6 +14,11 @@
 - Napojeno na GitHub (installation_id 139345471), branch `main`, auto-deploy
 - Build: `npm run build` → `dist/`, funkce `netlify/functions/`
 - Blobs store: `zastavka` (vzniká automaticky prvním zápisem)
+- **Netlify Forms**: form `rezervace` (id `6a2b03007d60320008917bab`) —
+  registruje ho skrytý formulář na hlavní stránce; submissions posílá
+  serverově funkce `/api/reserve`. E-mail notifikace na stipek.p@gmail.com
+  přes hook `6a2b039ddfed56f0dbeda009` (email/submission_created).
+  Free tier: 100 submissions/měsíc.
 - **Netlify MCP konektor vrací 401 (expirovaný token)** — používej lokální
   `netlify` CLI, je přihlášené jako stipek.p@gmail.com a funguje.
   V účtu je i starší sajta `zastavka-restaurace` (jiné repo) — nesahat.

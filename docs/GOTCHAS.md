@@ -31,6 +31,11 @@
   Ověřit po nastavení přes `netlify api getEnvVar` (pole `values[].context`).
 - Změna env proměnné se do funkcí dostane **až s novým deployem** — env se
   injektuje při nasazení, ne za běhu.
+- E-mail notifikace pro Netlify Forms přes API: `createHookBySiteId` chce
+  parametry jako `{site_id, body: {type:"email", event:"submission_created",
+  form_id, data:{email, subject_template}}}` — bez vnořeného `body` a bez
+  `form_id` vrací 422 bez vysvětlení. Hook jde vytvořit až PO prvním deployi,
+  kdy Netlify form zaregistruje (form_id vzniká při buildu).
 - **Blobs v `netlify dev` vrací z `list()` percent-encoded klíče**
   (`reservation%3A…` místo `reservation:…`) — prefix filtr na `:` lokálně
   selže. Klíče z listu vždy prohnat `decodeURIComponent` (v produkci
