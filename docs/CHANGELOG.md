@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-06-11 (pozdě večer)
+
+- Zjištěno: i kampaně Ecomailu vyžadují ověřenou doménu (`unverified-domain`)
+  → newsletter pojede až s doménou; kód ověřen po krok odeslání.
+- Rezervace předělány: e-mailová notifikace přes Netlify Forms (skrytý form
+  „rezervace"), primární úložiště Blobs, nový tab Rezervace v adminu
+  (přehled + mazání vyřízených). Endpoint `/api/admin/reservations`.
+- Oprava: Blobs `list()` v netlify dev vrací percent-encoded klíče.
+
 ## 2026-06-11 (večer)
 
 - Nasazena první verze na https://zastavka-web.netlify.app, naplněna ukázkovým

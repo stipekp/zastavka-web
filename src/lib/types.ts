@@ -36,6 +36,18 @@ export interface StaticMenuDoc {
   groups: MenuGroup[];
 }
 
+/** Rezervace uložená v Blobs (`reservation:{date}T{time}:{uuid}`). */
+export interface ReservationDoc {
+  name: string;
+  phone: string;
+  email: string;
+  date: string;
+  time: string;
+  guests: number;
+  note: string;
+  createdAt: string;
+}
+
 /** Odpověď veřejného endpointu /api/menu — bez nedostupných položek. */
 export interface PublicMenuResponse {
   now: { date: string; minutes: number };

@@ -47,7 +47,7 @@ export default function ReservationForm() {
     return (
       <div class="form-msg ok" style="font-size: 16px; padding: 24px; line-height: 1.7;">
         <strong>Rezervace je u nás.</strong><br />
-        Na {form.email} jsme poslali potvrzení. Kdyby termín z naší strany nevycházel, ozveme se — jinak se na vás těšíme.
+        Kdyby termín z naší strany nevycházel, ozveme se vám na {form.phone} — jinak se na vás těšíme.
       </div>
     );
   }

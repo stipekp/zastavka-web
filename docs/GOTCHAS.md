@@ -31,6 +31,11 @@
   Ověřit po nastavení přes `netlify api getEnvVar` (pole `values[].context`).
 - Změna env proměnné se do funkcí dostane **až s novým deployem** — env se
   injektuje při nasazení, ne za běhu.
+- **Blobs v `netlify dev` vrací z `list()` percent-encoded klíče**
+  (`reservation%3A…` místo `reservation:…`) — prefix filtr na `:` lokálně
+  selže. Klíče z listu vždy prohnat `decodeURIComponent` (v produkci
+  neškodné, naše klíče neobsahují `%`). `get()`/`set()` fungují s čistými
+  klíči správně v obou prostředích.
 
 - `purgeCache` funguje jen v nasazených funkcích (lokálně selže) — proto je
   v admin funkcích, ne v buildu.

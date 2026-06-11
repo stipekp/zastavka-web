@@ -1,9 +1,7 @@
 import type { Config } from "@netlify/functions";
 import { json, err, readJson } from "../lib/http";
 import { store } from "../lib/store";
-import { sendTransactional } from "../lib/ecomail";
-import { buildReservationEmails } from "../lib/email";
-import { czDateLabel } from "../../src/lib/menu-time";
+import type { ReservationDoc } from "../../src/lib/types";
 
 interface ReservationBody {
   name?: string;
@@ -20,6 +18,32 @@ interface ReservationBody {
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Notifikace jde přes Netlify Forms (form „rezervace" registrovaný skrytým
+ * formulářem na hlavní stránce) — e-mail obsluze posílá Netlify. Transakční
+ * e-maily Ecomailu vyžadují placený účet s doménou, viz docs/GOTCHAS.md.
+ */
+async function submitToNetlifyForms(r: ReservationDoc): Promise<void> {
+  const siteUrl = process.env.URL;
+  if (!siteUrl) throw new Error("Chybí env proměnná URL");
+  const body = new URLSearchParams({
+    "form-name": "rezervace",
+    name: r.name,
+    phone: r.phone,
+    email: r.email,
+    date: r.date,
+    time: r.time,
+    guests: String(r.guests),
+    note: r.note,
+  });
+  const res = await fetch(`${siteUrl}/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  if (!res.ok) throw new Error(`Netlify Forms → ${res.status}`);
+}
 
 export default async (req: Request): Promise<Response> => {
   if (req.method !== "POST") return err("Method not allowed", 405);
@@ -41,7 +65,7 @@ export default async (req: Request): Promise<Response> => {
   if (!Number.isInteger(guests) || guests < 1) return err("Vyberte prosím počet hostů.");
   if (guests > 7) return err("Skupiny od 8 osob řešíme po telefonu — zavolejte nám prosím na +420 311 678 432.");
 
-  const reservation = {
+  const reservation: ReservationDoc = {
     name,
     phone,
     email,
@@ -52,35 +76,14 @@ export default async (req: Request): Promise<Response> => {
     createdAt: new Date().toISOString(),
   };
 
-  // Záloha do Blobs — i kdyby e-mail selhal, rezervace se neztratí
+  // Primární úložiště — rezervace se zobrazují v adminu
   await store().setJSON(`reservation:${reservation.date}T${reservation.time}:${crypto.randomUUID()}`, reservation);
 
-  const restaurantEmail = process.env.RESERVATION_EMAIL;
-  if (!restaurantEmail) {
-    console.error("Chybí env proměnná RESERVATION_EMAIL");
-    return err("Rezervaci teď nejde odeslat — zavolejte nám prosím na +420 311 678 432.", 502);
-  }
-
-  const dateLabel = czDateLabel(reservation.date);
-  const emails = buildReservationEmails({ ...reservation, dateLabel });
-
+  // E-mailová notifikace je best-effort; rezervace už je uložená
   try {
-    await sendTransactional({
-      to: restaurantEmail,
-      subject: `Rezervace · ${dateLabel} ${reservation.time} · ${guests} os. · ${name}`,
-      html: emails.forRestaurant,
-      replyTo: email,
-    });
+    await submitToNetlifyForms(reservation);
   } catch (e) {
-    console.error("reservation mail failed:", e);
-    return err("Rezervaci se nepodařilo odeslat — zavolejte nám prosím na +420 311 678 432.", 502);
-  }
-
-  // Potvrzení hostovi je best-effort — rezervace už u nás je
-  try {
-    await sendTransactional({ to: email, subject: "Držíme vám místo · Zastávka", html: emails.forGuest });
-  } catch (e) {
-    console.error("guest confirmation failed:", e);
+    console.error("forms notification failed:", e);
   }
 
   return json({ ok: true });

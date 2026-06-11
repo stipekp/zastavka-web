@@ -135,6 +135,19 @@ import ReservationForm from "../islands/ReservationForm";
     </div>
   </section>
 
+  <!-- Skrytá statická kopie formuláře: podle ní Netlify při buildu zaregistruje
+       form „rezervace". Skutečná data posílá serverově funkce /api/reserve. -->
+  <form name="rezervace" data-netlify="true" netlify-honeypot="website" hidden aria-hidden="true">
+    <input type="text" name="name" />
+    <input type="text" name="phone" />
+    <input type="email" name="email" />
+    <input type="text" name="date" />
+    <input type="text" name="time" />
+    <input type="text" name="guests" />
+    <textarea name="note"></textarea>
+    <input type="text" name="website" />
+  </form>
+
   <footer class="site-footer">
     <div class="container">
       <div class="cols">

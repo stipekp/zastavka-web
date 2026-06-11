@@ -1,10 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
-import type { DayDoc, MenuGroup, MenuType, StaticMenuDoc } from "../../lib/types";
+import type { DayDoc, MenuGroup, MenuType, ReservationDoc, StaticMenuDoc } from "../../lib/types";
 import { MENU_TYPE_LABELS } from "../../lib/types";
 import { addDays, czDateLabel, menuTypesForDate } from "../../lib/menu-time";
 import GroupsEditor from "./GroupsEditor";
 
-type Tab = MenuType | "static";
+type Tab = MenuType | "static" | "reservations";
 
 function pragueToday(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Prague" }).format(new Date());
@@ -30,6 +30,67 @@ const put = (url: string, body: unknown) =>
   apiJson(url, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 const post = (url: string, body: unknown) =>
   apiJson(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+
+function Reservations({ today }: { today: string }) {
+  const [items, setItems] = useState<(ReservationDoc & { key: string })[] | null>(null);
+  const [error, setError] = useState("");
+
+  const load = () =>
+    apiJson("/api/admin/reservations")
+      .then((d) => setItems(d.reservations))
+      .catch((e) => setError(e.message));
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function remove(key: string, label: string) {
+    if (!confirm(`Smazat rezervaci ${label}? Použijte, až bude vyřízená.`)) return;
+    await apiJson(`/api/admin/reservations?key=${encodeURIComponent(key)}`, { method: "DELETE" });
+    load();
+  }
+
+  if (error) return <p class="form-msg error">{error}</p>;
+  if (!items) return <p>Načítám rezervace…</p>;
+  if (items.length === 0) return <p style="color: var(--muted);">Zatím žádné rezervace z webu.</p>;
+
+  const upcoming = items.filter((r) => r.date >= today);
+  const past = items.filter((r) => r.date < today);
+
+  const card = (r: ReservationDoc & { key: string }, faded: boolean) => (
+    <div class="adm-group" key={r.key} style={faded ? "opacity: 0.55;" : ""}>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline; justify-content: space-between;">
+        <div>
+          <strong style="font-family: var(--serif); font-size: 19px; color: var(--green);">
+            {czDateLabel(r.date)} v {r.time}
+          </strong>
+          <span style="margin-left: 10px; font-size: 14px;">{r.guests} {r.guests === 1 ? "host" : r.guests < 5 ? "hosté" : "hostů"}</span>
+        </div>
+        <button class="btn-sm danger" type="button" onClick={() => remove(r.key, `${r.name} (${r.date} ${r.time})`)}>
+          Vyřízeno · smazat
+        </button>
+      </div>
+      <div style="font-size: 14px; margin-top: 6px; line-height: 1.8;">
+        {r.name} · <a href={`tel:${r.phone}`}>{r.phone}</a> · <a href={`mailto:${r.email}`}>{r.email}</a>
+        {r.note && <div style="color: var(--muted); font-style: italic;">„{r.note}"</div>}
+        <div style="color: var(--muted); font-size: 12px;">přijato {new Date(r.createdAt).toLocaleString("cs-CZ")}</div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div>
+      {upcoming.length === 0 && <p style="color: var(--muted);">Žádné nadcházející rezervace.</p>}
+      {upcoming.map((r) => card(r, false))}
+      {past.length > 0 && (
+        <>
+          <p style="font-size: 13px; color: var(--muted); margin-top: 24px;">Proběhlé</p>
+          {past.slice(-10).reverse().map((r) => card(r, true))}
+        </>
+      )}
+    </div>
+  );
+}
 
 function Login({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("");
@@ -116,11 +177,12 @@ export default function AdminApp() {
   if (authed === null) return <div class="adm-login"><h1>Zastávka · admin</h1>Načítám…</div>;
   if (!authed) return <Login onSuccess={() => setAuthed(true)} />;
 
-  const groups: MenuGroup[] = tab === "static" ? staticDoc?.groups ?? [] : day?.menus?.[tab] ?? [];
+  const isMenuTab = tab !== "static" && tab !== "reservations";
+  const groups: MenuGroup[] = isMenuTab ? day?.menus?.[tab as MenuType] ?? [] : staticDoc?.groups ?? [];
 
   function setGroups(g: MenuGroup[]) {
     if (tab === "static") setStaticDoc({ groups: g });
-    else if (day) setDay({ ...day, menus: { ...day.menus, [tab]: g } });
+    else if (isMenuTab && day) setDay({ ...day, menus: { ...day.menus, [tab as MenuType]: g } });
     setDirty(true);
   }
 
@@ -143,15 +205,16 @@ export default function AdminApp() {
 
   /** Najde poslední den (max. týden zpět), který má pro aktuální typ menu nějaké položky. */
   async function copyFromPrevious() {
-    if (tab === "static" || !day) return;
+    if (!isMenuTab || !day) return;
+    const menuTab = tab as MenuType;
     setBusy(true);
     try {
       for (let i = 1; i <= 7; i++) {
         const d = addDays(date, -i);
         const doc: DayDoc = await apiJson(`/api/admin/day?date=${d}`);
-        const src = doc.menus?.[tab];
+        const src = doc.menus?.[menuTab];
         if (src && src.some((g) => g.items.length > 0)) {
-          setDay({ ...day, menus: { ...day.menus, [tab]: cloneGroups(src) } });
+          setDay({ ...day, menus: { ...day.menus, [menuTab]: cloneGroups(src) } });
           setDirty(true);
           notify(`Zkopírováno z ${czDateLabel(d)} — nezapomeňte uložit.`);
           return;
@@ -212,9 +275,12 @@ export default function AdminApp() {
         <button class={`adm-tab${tab === "static" ? " active" : ""}`} onClick={() => setTab("static")} type="button">
           Stálý lístek
         </button>
+        <button class={`adm-tab${tab === "reservations" ? " active" : ""}`} onClick={() => setTab("reservations")} type="button">
+          Rezervace
+        </button>
       </div>
 
-      {tab !== "static" && (
+      {isMenuTab && (
         <div class="adm-bar">
           <span style="font-size: 14px; color: var(--muted);">{czDateLabel(date)}</span>
           <span class="spacer" />
@@ -228,15 +294,17 @@ export default function AdminApp() {
         </div>
       )}
 
-      {tab === "static" && !staticDoc ? (
+      {tab === "reservations" ? (
+        <Reservations today={pragueToday()} />
+      ) : tab === "static" && !staticDoc ? (
         <p>Načítám stálý lístek…</p>
-      ) : tab !== "static" && !day ? (
+      ) : isMenuTab && !day ? (
         <p>Načítám menu…</p>
       ) : (
         <GroupsEditor groups={groups} onChange={setGroups} />
       )}
 
-      {tab !== "static" && day && (
+      {isMenuTab && day && (
         <div class="adm-day-settings">
           <div>
             <label for="day-note">Poznámka pod menu (platí pro celý den)</label>
