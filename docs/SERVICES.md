@@ -24,7 +24,7 @@
 |---|---|
 | `ADMIN_PASSWORD` | heslo do /admin |
 | `SESSION_SECRET` | náhodný řetězec pro podpis admin cookie |
-| `ECOMAIL_API_KEY` | API klíč Ecomailu (Ecomail → Integrace → API) |
+| `ECOMAIL_API_KEY` | API klíč Ecomailu (Ecomail → Integrace → API); nastaven jako secret pro production/deploy-preview/branch-deploy |
 | `ECOMAIL_LIST_LUNCH` | `5` — seznam Polední menu |
 | `ECOMAIL_LIST_WEEKEND` | `6` — seznam Víkendové menu |
 | `ECOMAIL_LIST_NEWS` | `7` — seznam Novinky a akce |

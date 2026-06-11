@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-06-11 (večer)
+
+- Nasazena první verze na https://zastavka-web.netlify.app, naplněna ukázkovým
+  menu (den 2026-06-11 + stálý lístek).
+- Nastaven `ECOMAIL_API_KEY` (pozor na past s `--context`, viz GOTCHAS).
+- Ověřeno: admin auth, zápis menu + okamžitý purge cache, subscribe do
+  Ecomail seznamů.
+- Zjištěno: transakční e-maily vyžadují placený Ecomail účet s ověřenou
+  doménou → rezervace zatím bez e-mailových notifikací (ukládají se do Blobs).
+
 ## 2026-06-11
 
 - Založen projekt: Astro 6 + Preact, Netlify Functions + Blobs, Ecomail.

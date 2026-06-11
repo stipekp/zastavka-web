@@ -7,15 +7,30 @@
 - Odeslání kampaně je **GET** `/campaign/{id}/send` (singulár!), zatímco
   vytvoření je POST `/campaigns` (plurál). Podle API blueprintu na Apiary.
 - Auth header se jmenuje doslova `key` (ne Authorization).
-- **NEOVĚŘENO V PRAXI** (čeká na první ostré odeslání): přesný tvar odpovědi
-  POST /campaigns (bereme `created.id`), merge tag `*|UNSUB|*` v patičce
-  e-mailu, tvar `/transactional/send-message`. Až se pošle první newsletter
-  a rezervace, ověřit a tenhle bod smazat/aktualizovat.
+- **Transakční e-maily (`/transactional/send-message`) vyžadují placený účet
+  a ověřenou doménu** — ověřeno 2026-06-11, API vrací 422 „Only for paid
+  accounts and verified domains". Na současném free účtu s gmail odesílatelem
+  **e-maily z rezervací nefungují** — formulář hostovi vrátí hlášku
+  „zavolejte nám", rezervace se ale uloží do Blobs (klíče `reservation:*`).
+  Řešení čeká na rozhodnutí (doména+placený plán / přehled rezervací
+  v adminu / jiný kanál).
+- Subscribe přes API ověřeno, funguje (200, `already_subscribed` u známých
+  kontaktů — kontakty jsou sdílené napříč účtem, status per seznam).
+- **NEOVĚŘENO V PRAXI**: tvar odpovědi POST /campaigns (bereme `created.id`)
+  a merge tag `*|UNSUB|*` — ověřit při prvním odeslání newsletteru.
 - Odesílatel je gmail adresa → bez SPF/DKIM hrozí spam folder. Pro ostrý
   provoz pořídit doménu a ověřit ji v Ecomailu (Nastavení → Domény).
 - V účtu je i cizí seznam ID 1 („Dobrý důvod") — patří jinému projektu.
 
 ## Netlify
+
+- **`netlify env:set --context` s čárkami NEFUNGUJE**: CLI vezme
+  `--context production,deploy-preview` jako název custom větve a proměnná
+  skončí v kontextu `branch` — produkce ji nevidí a funkce padají na chybějící
+  env. Flag se musí opakovat: `--context production --context deploy-preview`.
+  Ověřit po nastavení přes `netlify api getEnvVar` (pole `values[].context`).
+- Změna env proměnné se do funkcí dostane **až s novým deployem** — env se
+  injektuje při nasazení, ne za běhu.
 
 - `purgeCache` funguje jen v nasazených funkcích (lokálně selže) — proto je
   v admin funkcích, ne v buildu.
