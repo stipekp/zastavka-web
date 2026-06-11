@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-06-11 (noc)
+
+- Newsletter odblokován: odesílatel přepnut na ověřenou doménu
+  novinky.dobry-duvod.cz (`FROM_EMAIL=zastavka@novinky.dobry-duvod.cz`),
+  reply-to nově míří na RESERVATION_EMAIL (skutečná schránka).
+
 ## 2026-06-11 (pozdě večer)
 
 - Zjištěno: i kampaně Ecomailu vyžadují ověřenou doménu (`unverified-domain`)

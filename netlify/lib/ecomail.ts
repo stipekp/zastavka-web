@@ -10,6 +10,11 @@ function fromEmail(): string {
   return process.env.FROM_EMAIL ?? process.env.RESERVATION_EMAIL ?? "";
 }
 
+/** Odpovědi hostů mají chodit do skutečné schránky, ne na odesílací adresu bez mailboxu. */
+function replyTo(): string {
+  return process.env.RESERVATION_EMAIL ?? fromEmail();
+}
+
 async function api(path: string, method: string, body?: unknown): Promise<any> {
   const res = await fetch(`${BASE}${path}`, {
     method,
@@ -40,7 +45,7 @@ export async function sendTransactional(opts: { to: string; subject: string; htm
       subject: opts.subject,
       from_name: "Zastávka",
       from_email: fromEmail(),
-      reply_to: opts.replyTo ?? fromEmail(),
+      reply_to: opts.replyTo ?? replyTo(),
       html: opts.html,
       to: [{ email: opts.to }],
     },
@@ -54,7 +59,7 @@ export async function sendCampaign(opts: { listId: string; title: string; subjec
     subject: opts.subject,
     from_name: "Zastávka",
     from_email: fromEmail(),
-    reply_to: fromEmail(),
+    reply_to: replyTo(),
     html_text: opts.html,
     recepient_lists: [Number(opts.listId)],
   });

@@ -34,7 +34,7 @@
 | `ECOMAIL_LIST_WEEKEND` | `6` — seznam Víkendové menu |
 | `ECOMAIL_LIST_NEWS` | `7` — seznam Novinky a akce |
 | `RESERVATION_EMAIL` | kam chodí rezervace: stipek.p@gmail.com |
-| `FROM_EMAIL` | odesílatel e-mailů (default = RESERVATION_EMAIL) |
+| `FROM_EMAIL` | odesílatel e-mailů: `zastavka@novinky.dobry-duvod.cz` (adresa na doméně ověřené v Ecomailu; mailbox neexistuje, odpovědi chodí na reply-to = RESERVATION_EMAIL) |
 
 `URL` nastavuje Netlify samo (používá se v odkazech v e-mailech).
 
@@ -43,8 +43,10 @@
 - Účet: napojený přes MCP (vlastník stipek.p@gmail.com)
 - Seznamy: **5** polední menu · **6** víkendové menu · **7** novinky a akce
   (v účtu existuje i ID 1 — patří jinému projektu „Dobrý důvod", nesahat)
-- Odesílatel: Zastávka <stipek.p@gmail.com> — gmail adresa nemá SPF/DKIM,
-  pro ostrý provoz je potřeba vlastní doména (viz GOTCHAS)
+- Ověřená doména: **novinky.dobry-duvod.cz** (sdílená s projektem Dobrý
+  důvod) — odesílatel kampaní je Zastávka <zastavka@novinky.dobry-duvod.cz>,
+  reply-to stipek.p@gmail.com. Až bude vlastní doména restaurace, ověřit ji
+  v Ecomailu a přepnout `FROM_EMAIL`.
 - Newsletter = kampaň přes API; rezervace = transakční e-mail
 - Odhlašování řeší Ecomail (merge tag v patičce šablony)
 
