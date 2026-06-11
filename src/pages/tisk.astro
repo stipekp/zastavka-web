@@ -1,0 +1,32 @@
+---
+import Base from "../layouts/Base.astro";
+import PrintView from "../islands/PrintView";
+---
+
+<Base title="Zastávka · tisk menu" description="Tisková verze menu.">
+  <meta name="robots" content="noindex, nofollow" slot="head" />
+  <PrintView client:only="preact" />
+</Base>
+
+<style is:global>
+  body { background: #fff; }
+  .print-sheet { max-width: 640px; margin: 0 auto; padding: 40px 28px; color: var(--ink); }
+  .print-sheet header { text-align: center; border-bottom: 2px solid var(--green); padding-bottom: 18px; margin-bottom: 8px; }
+  .print-sheet .brand { font-family: var(--serif); font-size: 34px; font-weight: 600; color: var(--green); }
+  .print-sheet .brand-sub { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--brown); }
+  .print-sheet h1 { font-size: 26px; margin-top: 14px; }
+  .print-sheet .date { font-size: 14px; color: var(--muted); }
+  .print-sheet h2 { font-size: 13px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brown); font-family: var(--sans); margin: 22px 0 4px; }
+  .print-sheet .row { display: flex; justify-content: space-between; gap: 18px; align-items: baseline; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+  .print-sheet .name { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--green); }
+  .print-sheet .desc { font-size: 13px; color: var(--muted); }
+  .print-sheet .price { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--brown); white-space: nowrap; }
+  .print-sheet .tag { font-size: 10px; font-weight: 600; border: 1px solid var(--green); color: var(--green); border-radius: 999px; padding: 1px 7px; margin-left: 7px; vertical-align: 2px; }
+  .print-sheet .note { font-size: 13px; font-style: italic; color: var(--muted); margin-top: 16px; }
+  .print-sheet footer { text-align: center; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 28px; padding-top: 12px; }
+  .print-sheet .no-print { display: block; margin: 28px auto 0; font-family: var(--sans); font-size: 15px; font-weight: 600; background: var(--green); color: var(--cream); border: 0; border-radius: 9px; padding: 12px 26px; cursor: pointer; }
+  @media print {
+    .no-print { display: none !important; }
+    .print-sheet { padding: 0; max-width: none; }
+  }
+</style>

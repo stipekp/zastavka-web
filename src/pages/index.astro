@@ -1,0 +1,161 @@
+---
+import Base from "../layouts/Base.astro";
+import DailyMenu from "../islands/DailyMenu";
+import StaticMenu from "../islands/StaticMenu";
+import NewsletterInline from "../islands/NewsletterInline";
+import NewsletterSection from "../islands/NewsletterSection";
+import ReservationForm from "../islands/ReservationForm";
+---
+
+<Base title="Zastávka · bistro Nučice — denní menu, stálý lístek, rezervace">
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="/">Zastávka<small>bistro · Nučice</small></a>
+      <nav class="site-nav" aria-label="Hlavní navigace">
+        <a href="#menu">Denní menu</a>
+        <a href="#staly-listek">Stálý lístek</a>
+        <a href="#o-nas">O nás</a>
+        <a href="#newsletter">Newsletter</a>
+        <a href="#kontakt">Kontakt</a>
+      </nav>
+      <a class="btn btn-primary" href="#rezervace">Rezervovat stůl</a>
+    </div>
+  </header>
+
+  <section class="hero" style="padding-block: 0;">
+    <div class="hero-inner">
+      <p class="kicker">Bistro v Nučicích · od roku 2019</p>
+      <h1>Zastavte se.<br />Vařit dnes nemusíte.</h1>
+      <p class="lead">
+        Jsme kousek od nučického nádraží a vaříme tak, jak se vaří doma —
+        z lokálních surovin, bez zbytečných parád. Každý všední den čerstvé
+        polední menu, o víkendu o trochu sváteční.
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-light" href="#menu">Co dnes vaříme</a>
+        <a class="btn btn-outline-light" href="#rezervace">Rezervovat stůl</a>
+      </div>
+      <div class="hero-facts">
+        <span>★ 4,8 na Google</span>
+        <span>68 míst</span>
+        <span>Po–So 11–22 · Ne 11–21</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="menu">
+    <div class="container">
+      <p class="kicker">Aktuální nabídka</p>
+      <h2 style="font-size: clamp(30px, 4.5vw, 44px); margin-bottom: 28px;">Co se dnes vaří</h2>
+      <DailyMenu client:load />
+      <NewsletterInline client:visible />
+    </div>
+  </section>
+
+  <section id="staly-listek" style="padding-top: 0;">
+    <div class="container">
+      <div class="split" style="align-items: start;">
+        <div>
+          <p class="kicker">K mání kdykoli</p>
+          <h2 style="font-size: clamp(30px, 4.5vw, 44px); margin-bottom: 16px;">Stálý lístek</h2>
+          <p style="color: var(--muted); max-width: 46ch;">
+            Burgery, ryby, grilovaná masa a dezerty — věci, co máme na lístku
+            pořád, ať přijdete v poledne nebo večer.
+          </p>
+          <div class="photo-frame" style="margin-top: 24px;">
+            <img src="/img/staly-listek.jpg" alt="Jídla ze stálého lístku na dřevěném stole" loading="lazy" />
+          </div>
+        </div>
+        <StaticMenu client:visible />
+      </div>
+    </div>
+  </section>
+
+  <section id="o-nas" class="section-green">
+    <div class="container split">
+      <div class="photo-frame">
+        <img src="/img/interier.jpg" alt="Interiér bistra" loading="lazy" />
+      </div>
+      <div>
+        <p class="kicker">O nás</p>
+        <h2 style="font-size: clamp(30px, 4.5vw, 44px); margin-bottom: 16px;">Jako u sousedů</h2>
+        <p>
+          Zastávku jsme otevřeli v roce 2019 s jednoduchou představou: místo,
+          kam se dá zajít na poctivý oběd, kafe i večeři, a kde se nikdo
+          nemusí cítit jako na návštěvě.
+        </p>
+        <p>
+          Suroviny bereme od lokálních dodavatelů, menu píšeme každý den podle
+          toho, co je čerstvé. Uvnitř je 68 míst, klid a žádný spěch — vlak vám
+          tu neujede, nádraží je hned vedle.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section id="newsletter">
+    <div class="container" style="max-width: 720px;">
+      <p class="kicker" style="text-align: center;">Newsletter</p>
+      <h2 style="font-size: clamp(30px, 4.5vw, 44px); text-align: center; margin-bottom: 12px;">
+        Menu rovnou do schránky
+      </h2>
+      <p style="text-align: center; color: var(--muted); margin-bottom: 32px;">
+        Vyberte si, co vás zajímá. Žádný spam — posíláme jen to, co sami
+        rádi čteme. Odhlásit se jde kdykoli jedním klikem v patičce e-mailu.
+      </p>
+      <NewsletterSection client:visible />
+    </div>
+  </section>
+
+  <section id="rezervace" style="background: var(--beige);">
+    <div class="container">
+      <p class="kicker">Rezervace</p>
+      <h2 style="font-size: clamp(30px, 4.5vw, 44px); margin-bottom: 28px;">Držíme vám místo</h2>
+      <div class="split" style="align-items: start;">
+        <ReservationForm client:visible />
+        <div id="kontakt">
+          <iframe
+            src="https://www.google.com/maps?q=N%C3%A1dra%C5%BEn%C3%AD%20138%2C%20Nu%C4%8Dice&output=embed"
+            width="100%"
+            height="280"
+            style="border: 0; border-radius: 14px;"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Mapa — Zastávka, Nádražní 138, Nučice"
+          ></iframe>
+          <div style="margin-top: 20px; font-size: 15px; line-height: 2;">
+            <strong style="font-family: var(--serif); font-size: 22px; color: var(--green);">Zastávka</strong><br />
+            Nádražní 138, 252 16 Nučice<br />
+            <a href="tel:+420311678432">+420 311 678 432</a><br />
+            Po–So 11–22 · Ne 11–21<br />
+            <span style="color: var(--muted); font-size: 14px;">Skupiny od 8 osob prosím po telefonu — domluvíme detaily.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="cols">
+        <div>
+          <h4>Zastávka</h4>
+          <p>Poctivá kuchyně kousek od nádraží.<br />Nučice, od roku 2019.</p>
+        </div>
+        <div>
+          <p>
+            Nádražní 138, 252 16 Nučice<br />
+            <a href="tel:+420311678432">+420 311 678 432</a>
+          </p>
+        </div>
+        <div>
+          <p>Po–So 11.00–22.00<br />Ne 11.00–21.00</p>
+        </div>
+      </div>
+      <div class="fine">
+        <span>© {new Date().getFullYear()} Bistro Zastávka</span>
+        <span>Fotografie: Unsplash</span>
+      </div>
+    </div>
+  </footer>
+</Base>
